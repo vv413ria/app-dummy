@@ -1,4 +1,4 @@
-package edu.marinValeria.appdummy.ui.theme
+package es.javiercarrasco.appdummy.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
