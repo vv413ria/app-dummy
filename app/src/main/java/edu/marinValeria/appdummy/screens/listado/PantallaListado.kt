@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import edu.marinValeria.appdummy.R
 
 // ─── screens/PantallaListado.kt ──────────────────────────────────────────────────────────────────
 
