@@ -14,20 +14,21 @@ import androidx.navigation.compose.rememberNavController
 import edu.marinValeria.appdummy.screens.bienvenida.PantallaBienvenida
 import edu.marinValeria.appdummy.screens.favoritos.PantallaFavoritos
 import edu.marinValeria.appdummy.screens.listado.PantallaListado
-import androidx.navigation.compose.composable
 import edu.marinValeria.appdummy.screens.detalle.PantallaDetalle
-
+import androidx.navigation.NavHostController
 // R12: aqui viven el NavHost y el NavController
 @Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
+fun AppNavigation(
+    navController: NavHostController = rememberNavController()
+) {
     // R15: el destino activo sale de currentBackStackEntryAsState()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val destinoActual = backStackEntry?.destination
-    // la barra solo aparece en las pestañas, no en la bienvenida
-    val mostrarBarra = destinoActual?.hierarchy?.any { destino ->
-        itemsNavegacionPrincipal.any { destino.hasRoute(it.ruta::class) }
-    } == true
+
+    // la barra solo se ve en las pestañas, no en la bienvenida ni en el detalle
+    val mostrarBarra = itemsNavegacionPrincipal.any { item ->
+        destinoActual?.hierarchy?.any { it.hasRoute(item.ruta::class) } == true
+    }
 
     Scaffold(
         bottomBar = {
@@ -36,8 +37,7 @@ fun AppNavigation() {
                     items = itemsNavegacionPrincipal,
                     destinoActual = destinoActual,
                     onItemClick = { item ->
-                        // R16: estas cuatro opciones son las que hacen que
-                        // al volver a una pestaña se recupere su scroll
+                        // R16: estas cuatro opciones conservan el estado de cada pestaña
                         navController.navigate(item.ruta) {
                             popUpTo<Listado> { saveState = true }
                             launchSingleTop = true
