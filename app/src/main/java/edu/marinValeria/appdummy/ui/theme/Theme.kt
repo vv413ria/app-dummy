@@ -1,4 +1,4 @@
-package es.javiercarrasco.appdummy.ui.theme
+package edu.marinValeria.appdummy.ui.theme
 
 import android.app.Activity
 import android.os.Build
