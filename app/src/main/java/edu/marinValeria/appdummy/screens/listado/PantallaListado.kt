@@ -180,6 +180,7 @@ fun ItemLibro(
     Card(
         onClick = { onClick(libro.id) },
         modifier = Modifier.fillMaxWidth()
+            .height(180.dp)             //altura fija porque hasta que no carga la portada Compose no sabe cuanto mide
     ) {
 
         Column(
