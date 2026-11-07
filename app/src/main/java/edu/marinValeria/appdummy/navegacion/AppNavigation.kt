@@ -16,6 +16,7 @@ import edu.marinValeria.appdummy.screens.favoritos.PantallaFavoritos
 import edu.marinValeria.appdummy.screens.listado.PantallaListado
 import edu.marinValeria.appdummy.screens.detalle.PantallaDetalle
 import androidx.navigation.NavHostController
+import edu.marinValeria.appdummy.screens.permisos.PantallaGestionPermisos
 // R12: aqui viven el NavHost y el NavController
 @Composable
 fun AppNavigation(
@@ -64,9 +65,6 @@ fun AppNavigation(
                     }
                 )
             }
-            composable<Listado> {
-                PantallaListado()
-            }
             composable<Favoritos> {
                 PantallaFavoritos(
                     onNavegaADetalle = { id -> navController.navigate(Detalle(id = id)) }
@@ -74,13 +72,16 @@ fun AppNavigation(
             }
             composable<Listado> {
                 PantallaListado(
-                    onNavegaADetalle = { id -> navController.navigate(Detalle(id = id)) }
+                    onNavegaADetalle = { id -> navController.navigate(Detalle(id = id)) },
+                            onNavegaAPermisos = { navController.navigate(Permisos) }
                 )
             }
-
             composable<Detalle> {
                 // R12: se vuelve con navigateUp()
                 PantallaDetalle(onVolver = { navController.navigateUp() })
+            }
+            composable<Permisos> {
+                PantallaGestionPermisos(onVolver = { navController.navigateUp() })
             }
         }
     }
