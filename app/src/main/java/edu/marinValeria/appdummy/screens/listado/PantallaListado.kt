@@ -24,9 +24,8 @@ import coil3.request.crossfade
 import edu.marinValeria.appdummy.R
 import edu.marinValeria.appdummy.data.model.Libro
 import androidx.compose.runtime.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaListado(
@@ -40,7 +39,7 @@ fun PantallaListado(
     val autores by viewModel.autores.collectAsStateWithLifecycle()
     //R8
     val snackbarHostState = remember { SnackbarHostState() }
-
+    val gridState = rememberLazyGridState() // R16: el estado del scroll se crea aqui para que sobreviva al cambio de pestaña
 
     // R8 escucha los eventos del VM una sola vez
     LaunchedEffect(Unit) {
@@ -149,6 +148,7 @@ fun PantallaListado(
                         } else {
                             //si hay libros, se pintan en un grid de dos columnas
                             LazyVerticalGrid(
+                                state = gridState,
                                 columns = GridCells.Fixed(2),
                                 contentPadding = PaddingValues(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -179,8 +179,7 @@ fun ItemLibro(
 ) {
     Card(
         onClick = { onClick(libro.id) },
-        modifier = Modifier.fillMaxWidth()
-            .height(180.dp)             //altura fija porque hasta que no carga la portada Compose no sabe cuanto mide
+        modifier = Modifier.fillMaxWidth()           //altura fija porque hasta que no carga la portada Compose no sabe cuanto mide
     ) {
 
         Column(
@@ -198,14 +197,19 @@ fun ItemLibro(
                         .build(),
                     contentDescription = "Portada de ${libro.titulo}",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth()
+                    // altura fija porque hasta que no carga la portada Compose no sabe cuanto mide
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(230.dp)
                 )
             else //Si la url no es válida saldra la imagen por defecto
                 AsyncImage(
                     model = R.drawable.nocover,
                     contentDescription = "Portada de ${libro.titulo}",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
                 )
             Text(
                 text = "${libro.autor} • ${libro.year}",
