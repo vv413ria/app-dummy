@@ -1,10 +1,13 @@
 package edu.marinValeria.appdummy.screens.listado
 
 import android.util.Patterns
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -29,6 +32,9 @@ fun PantallaListado(
     viewModel: LibrosViewModel = viewModel(factory = LibrosViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val busqueda by viewModel.busqueda.collectAsStateWithLifecycle()
+    val autorSeleccionado by viewModel.autorSeleccionado.collectAsStateWithLifecycle()
+    val autores by viewModel.autores.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("AppDummy") }) }
@@ -64,24 +70,86 @@ fun PantallaListado(
                 }
 
                 is LibrosUiState.Exito -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(estado.libros, key = { it.id }) { libro ->
-                            ItemLibro(libro = libro)
+                    Column {
+                        //R7: la pantalla solo avisará al ViewModel del texto nuevo
+                        OutlinedTextField(
+                            value = busqueda,
+                            onValueChange = { viewModel.actualizarBusqueda(it) }, //avisa al ViewModel de lo que se escribe, no lo gaurda la pantalla
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            placeholder = { Text("Buscar libros...") },
+                            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                            trailingIcon = {
+                                AnimatedVisibility(visible = busqueda.isNotEmpty()) {
+                                    IconButton(onClick = { viewModel.actualizarBusqueda("") }) {
+                                        Icon(Icons.Default.Clear, contentDescription = "Borrar búsqueda")
+                                    }
+                                }
+                            }, singleLine = true)  // el buscador ocupa una sola linea y no crece al escribir
+
+                        // R7: filtro por autor
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        ) {
+                            items(autores) { autor ->
+                                FilterChip(
+                                    selected = autor == autorSeleccionado,
+                                    onClick = { viewModel.seleccionarAutor(autor) },
+                                    label = { Text(autor) }
+                                )
+                            }
+                        }
+                        if (estado.libros.isEmpty()) { //si esta vacio se muestra un icono y pinta un aviso
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(
+                                        Icons.Default.SearchOff,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(64.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        "Sin resultados para \"$busqueda\"",
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+                        } else {
+                            //si hay libros, se pintan en un grid de dos columnas
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                contentPadding = PaddingValues(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(estado.libros, key = { it.id }) { libro ->
+                                    ItemLibro(
+                                        libro = libro,
+                                        onToggleLeido = { viewModel.toggleLeido(it) },
+                                        onToggleFavorito = { viewModel.toggleFavorito(it) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
 }
-
+}
 @Composable
-fun ItemLibro(libro: Libro) {
+fun ItemLibro(
+    libro: Libro,
+    onToggleLeido: (Int) -> Unit,
+    onToggleFavorito: (Int) -> Unit
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
@@ -107,18 +175,16 @@ fun ItemLibro(libro: Libro) {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth()
                 )
-
             Text(
                 text = "${libro.autor} • ${libro.year}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                IconButton(onClick = { }) {
+                IconButton(onClick = { onToggleLeido(libro.id) }) {
                     Icon(
                         imageVector = if (libro.leido) Icons.Default.BookmarkAdded
                         else Icons.Default.BookmarkBorder,
@@ -127,7 +193,7 @@ fun ItemLibro(libro: Libro) {
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                IconButton(onClick = { }) {
+                IconButton(onClick = { onToggleFavorito(libro.id) }) {
                     Icon(
                         imageVector = if (libro.esFavorito) Icons.Default.Favorite
                         else Icons.Default.FavoriteBorder,
