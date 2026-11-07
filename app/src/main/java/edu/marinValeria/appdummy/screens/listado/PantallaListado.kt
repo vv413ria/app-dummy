@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PantallaListado(
     onNavegaADetalle: (Int) -> Unit = {},
+    onNavegaAPermisos: () -> Unit = {},
     viewModel: LibrosViewModel = viewModel(factory = LibrosViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -51,7 +52,17 @@ fun PantallaListado(
     }
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = { TopAppBar(title = { Text("AppDummy") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("AppDummy") },
+                actions = {
+                    // R19: acceso a la pantalla de permisos
+                    IconButton(onClick = onNavegaAPermisos) {
+                        Icon(Icons.Default.Settings, contentDescription = "Permisos")
+                    }
+                }
+            )
+        }
     ) { paddingValues ->
         Box(
             modifier = Modifier

@@ -16,3 +16,6 @@ data class Detalle(val id: Int)
 
 @Serializable
 data object Favoritos
+// R19: los permisos son un destino mas del grafo
+@Serializable
+data object Permisos

@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 // ─── screens/PantallaGestionPermisos.kt ──────────────────────────────────────────────────────────
 
 // Estado del permiso — representado como sealed class
@@ -33,7 +33,7 @@ sealed class EstadoPermiso {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaGestionPermisos() {
+fun PantallaGestionPermisos(onVolver: () -> Unit = {}) {
     val context = LocalContext.current
 
     // Comprobación inicial del estado del permiso de cámara
@@ -53,8 +53,17 @@ fun PantallaGestionPermisos() {
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Permisos de AppDummy") }) }
-    ) { padding ->
+        topBar = {
+            TopAppBar(
+                title = { Text("Permisos de AppDummy") },
+                navigationIcon = {
+                    IconButton(onClick = onVolver) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            )
+        }
+    ){ padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
