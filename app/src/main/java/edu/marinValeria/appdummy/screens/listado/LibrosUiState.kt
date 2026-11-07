@@ -8,7 +8,7 @@ sealed class LibrosUiState {
     data class Error(val mensaje: String) : LibrosUiState()
 }
 
-// Eventos de un solo disparo (SharedFlow)
+//R8: Eventos de un solo disparo: se muestran una vez y no se repiten al rotar, emitida por shareflow para mostrar snackbar
 sealed class LibrosEvento {
     data class MostrarSnackbar(val mensaje: String) : LibrosEvento()
 }

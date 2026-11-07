@@ -11,8 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,6 +23,9 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import edu.marinValeria.appdummy.R
 import edu.marinValeria.appdummy.data.model.Libro
+import androidx.compose.runtime.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,8 +36,20 @@ fun PantallaListado(
     val busqueda by viewModel.busqueda.collectAsStateWithLifecycle()
     val autorSeleccionado by viewModel.autorSeleccionado.collectAsStateWithLifecycle()
     val autores by viewModel.autores.collectAsStateWithLifecycle()
+    //R8
+    val snackbarHostState = remember { SnackbarHostState() }
 
+
+    // R8 escucha los eventos del VM una sola vez
+    LaunchedEffect(Unit) {
+        viewModel.eventos.collect { evento ->
+            when (evento) {
+                is LibrosEvento.MostrarSnackbar -> snackbarHostState.showSnackbar(evento.mensaje)
+            }
+        }
+    }
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = { TopAppBar(title = { Text("AppDummy") }) }
     ) { paddingValues ->
         Box(
