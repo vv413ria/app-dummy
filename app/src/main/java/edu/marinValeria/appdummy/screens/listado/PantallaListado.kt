@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaListado(
+    onNavegaADetalle: (Int) -> Unit = {},
     viewModel: LibrosViewModel = viewModel(factory = LibrosViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -145,6 +146,7 @@ fun PantallaListado(
                                 items(estado.libros, key = { it.id }) { libro ->
                                     ItemLibro(
                                         libro = libro,
+                                        onClick = onNavegaADetalle,
                                         onToggleLeido = { viewModel.toggleLeido(it) },
                                         onToggleFavorito = { viewModel.toggleFavorito(it) }
                                     )
@@ -160,10 +162,15 @@ fun PantallaListado(
 @Composable
 fun ItemLibro(
     libro: Libro,
+    onClick: (Int) -> Unit,
     onToggleLeido: (Int) -> Unit,
     onToggleFavorito: (Int) -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        onClick = { onClick(libro.id) },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()

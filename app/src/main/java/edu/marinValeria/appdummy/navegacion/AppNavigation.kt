@@ -14,6 +14,8 @@ import androidx.navigation.compose.rememberNavController
 import edu.marinValeria.appdummy.screens.bienvenida.PantallaBienvenida
 import edu.marinValeria.appdummy.screens.favoritos.PantallaFavoritos
 import edu.marinValeria.appdummy.screens.listado.PantallaListado
+import androidx.navigation.compose.composable
+import edu.marinValeria.appdummy.screens.detalle.PantallaDetalle
 
 // R12: aqui viven el NavHost y el NavController
 @Composable
@@ -66,7 +68,19 @@ fun AppNavigation() {
                 PantallaListado()
             }
             composable<Favoritos> {
-                PantallaFavoritos()
+                PantallaFavoritos(
+                    onNavegaADetalle = { id -> navController.navigate(Detalle(id = id)) }
+                )
+            }
+            composable<Listado> {
+                PantallaListado(
+                    onNavegaADetalle = { id -> navController.navigate(Detalle(id = id)) }
+                )
+            }
+
+            composable<Detalle> {
+                // R12: se vuelve con navigateUp()
+                PantallaDetalle(onVolver = { navController.navigateUp() })
             }
         }
     }
