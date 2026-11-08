@@ -11,11 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.saveable.rememberSaveable
 
 // ─── screens/PantallaBienvenida.kt ───────────────────────────────────────────────────────────────
 @Composable
 fun PantallaBienvenida(onEntrar: () -> Unit) {
-    var nombreUsuario by remember { mutableStateOf("") }
+    var nombreUsuario by rememberSaveable { mutableStateOf("") }
     val botonHabilitado = nombreUsuario.trim().length >= 3
 
     Column(
